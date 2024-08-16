@@ -65,18 +65,20 @@
         catppuccin-nvim
       ];
       extraConfig = ''
-syntax on
-set number
-set relativenumber
-set nocompatible
-filetype plugin indent on
-set tabstop=4
-set softtabstop=0 noexpandtab
-set shiftwidth=4
-set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
-autocmd FileType nix setlocal ts=2 sts=2 sw=2 expandtab
-set mouse=
+        syntax on
+        set number
+        set relativenumber
+        set nocompatible
+        filetype plugin indent on
+        set tabstop=4
+        set softtabstop=0 noexpandtab
+        set shiftwidth=4
+        set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
+        autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+        autocmd FileType nix setlocal ts=2 sts=2 sw=2 expandtab
+        set colorcolumn=65
+        set textwidth=65
+        set mouse=
       '';
     };
 
@@ -106,10 +108,15 @@ set mouse=
       enable = true;
       userEmail = "me@ezrizhu.com";
       userName = "Ezri Zhu";
-     # signing = {
-     #   signByDefault = true;
-     # 	key = "/home/ezri/.ssh/id_ed25519";
-     # };
+      signing = {
+        signByDefault = true;
+      	key = "/home/ezri/.ssh/id_ed25519";
+      };
+      extraConfig = {
+        gpg = {
+	  "format" = "ssh";
+        };
+      };
     };
 
     home.stateVersion = "24.05";
