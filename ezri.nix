@@ -7,48 +7,75 @@
 {
   users.users.ezri = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "dialout" ];
+    extraGroups = [ "wheel" "dialout" "docker" "libvirtd" ];
     shell = pkgs.zsh;
     ignoreShellProgramCheck = true;
   };
+
   home-manager.users.ezri = { pkgs, ... }: {
     home.packages = with pkgs; [
       croc
-      firefox
-      tree
-      hyfetch
-      htop
-      dig
-      mtr
-      aerc
-      wget
-      curl
-      signal-desktop
-     ];
+        firefox
+        tree
+        hyfetch
+        htop
+        dig
+        mtr
+        aerc
+        wget
+        curl
+        signal-desktop
+        zathura
+        feh
+        file
+        docker-compose
+        vagrant
+        lm_sensors
+        xdg-utils
+        openssl
+    ];
+
+    nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "vagrant"
+    ];
+
     programs.zsh = {
       enable = true;
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       plugins = [
-        {
-          name = "vi-mode";
-          src = pkgs.zsh-vi-mode;
-          file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
-        }
+      {
+        name = "vi-mode";
+        src = pkgs.zsh-vi-mode;
+        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+      }
       ];
       shellAliases = {
         ll = "ls -l";
-	update = "sudo nix-channel --upgrade";
+        update = "sudo nix-channel --upgrade";
         upgrade = "sudo nixos-rebuild switch";
-	gc = "sudo nix-collect-garbage --delete-older-than 30d";
+        gc = "sudo nix-collect-garbage";
+        userConfig = "vim /etc/nixos/ezri.nix";
+        sysConfig = "vim /etc/nixos/configuration.nix";
+        tmuxn = "tmux new-session 'tmux source-file .config/tmux/tmux.conf && zsh'";
       };
       history = {
         size = 10000;
         path = "/home/ezri/.zsh_history";
       };
     };
-    programs.starship.enable = true;
+
+    programs.starship = {
+      enable = true;
+      settings = {
+        add_newline = false;
+        character = {
+          success_symbol = "[λ](bold green)";
+          error_symbol = "[λ](bold red)";
+        };
+      };
+    };
 
     programs.neovim = {
       enable = true;
@@ -57,12 +84,9 @@
       vimAlias = true;
       vimdiffAlias = true;
       plugins = with pkgs.vimPlugins; [
-        nvim-lspconfig
-        nvim-treesitter.withAllGrammars
-        plenary-nvim
-        gruvbox-material
-        mini-nvim
         catppuccin-nvim
+          vim-go
+          coc-rust-analyzer
       ];
       extraConfig = ''
         syntax on
@@ -79,7 +103,10 @@
         set colorcolumn=65
         set textwidth=65
         set mouse=
-      '';
+        cmap w!! w !sudo tee % >/dev/null
+        set termguicolors
+        colorscheme catppuccin-mocha
+        '';
     };
 
     programs.tmux = {
@@ -87,21 +114,46 @@
       shell = "${pkgs.zsh}/bin/zsh";
       terminal = "tmux-256color";
       historyLimit = 100000;
-      plugins = with pkgs;
-        [
-          tmuxPlugins.catppuccin
-          tmuxPlugins.yank
-          tmuxPlugins.sensible
-        ];
+      plugins = with pkgs.tmuxPlugins;
+      [
+      catppuccin
+          yank
+          sensible
+          pain-control
+          battery
+      ];
       extraConfig = ''
         set -g allow-rename off
         set-option -g status-position top
         set-option -g repeat-time 0
         set-option -g renumber-windows on
         set -sg escape-time 0
+
         set -g mouse on
         setw -g mode-keys vi
-      '';
+        set-option -g mode-keys vi
+        set-option -ga terminal-overrides ",xterm-256color*:Tc:smso"
+
+        set -g @catppuccin_window_left_separator ""
+        set -g @catppuccin_window_right_separator " "
+        set -g @catppuccin_window_middle_separator " █"
+        set -g @catppuccin_window_number_position "right"
+
+        set -g @catppuccin_window_default_fill "number"
+        set -g @catppuccin_window_default_text "#W"
+
+        set -g @catppuccin_window_current_fill "number"
+        set -g @catppuccin_window_current_text "#W"
+
+        set -g @catppuccin_status_modules_right "session user host battery date_time"
+        set -g @catppuccin_status_left_separator  " "
+        set -g @catppuccin_status_right_separator ""
+        set -g @catppuccin_status_fill "icon"
+        set -g @catppuccin_status_connect_separator "no"
+
+        set -g @catppuccin_directory_text "#{pane_current_path}"
+        set -g @catppuccin_date_time_text "%Y-%m-%d %H:%M"
+        '';
     };
 
     programs.git = {
@@ -110,11 +162,11 @@
       userName = "Ezri Zhu";
       signing = {
         signByDefault = true;
-      	key = "/home/ezri/.ssh/id_ed25519";
+        key = "/home/ezri/.ssh/id_ed25519";
       };
       extraConfig = {
         gpg = {
-	  "format" = "ssh";
+          "format" = "ssh";
         };
       };
     };

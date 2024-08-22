@@ -30,6 +30,9 @@
   networking.networkmanager.wifi.backend = "iwd";
   networking.nameservers = ["9.9.9.10" "149.112.112.10"];
 
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+
   security.sudo-rs = {
     enable = true;
     wheelNeedsPassword = false;
@@ -80,6 +83,16 @@
     curl
     tmux
   ];
+
+  virtualisation = {
+    docker.enable = true;
+    libvirtd.enable = true;
+  };
+
+  programs.virt-manager.enable = true;
+
+  services.power-profiles-daemon.enable = false;
+  services.tlp.enable = true;
 
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
