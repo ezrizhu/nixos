@@ -33,6 +33,10 @@
         lm_sensors
         xdg-utils
         openssl
+        bat
+        restic
+        rclone
+        age
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
@@ -55,7 +59,8 @@
         ll = "ls -l";
         update = "sudo nix-channel --upgrade";
         upgrade = "sudo nixos-rebuild switch";
-        gc = "sudo nix-collect-garbage";
+        cg = "sudo nix-collect-garbage";
+        cgd = "sudo nix-collect-garbage --delete-older-than 7d";
         userConfig = "vim /etc/nixos/ezri.nix";
         sysConfig = "vim /etc/nixos/configuration.nix";
         tmuxn = "tmux new-session 'tmux source-file .config/tmux/tmux.conf && zsh'";
