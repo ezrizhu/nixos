@@ -54,6 +54,7 @@
         fprintd
         imagemagick
         telegram-desktop
+        magic-wormhole
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
