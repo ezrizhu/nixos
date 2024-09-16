@@ -68,6 +68,8 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
+  services.flatpak.enable = true;
+
   # Enable sound.
   #  sound.enable = true;
   #  hardware.pulseaudio.enable = true;
@@ -83,6 +85,7 @@
     curl
     tmux
   ];
+  environment.localBinInPath = true;
 
   virtualisation = {
     docker.enable = true;

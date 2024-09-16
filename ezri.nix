@@ -32,15 +32,35 @@
         vagrant
         lm_sensors
         xdg-utils
+        kdePackages.kconfig
         openssl
         bat
         restic
         rclone
         age
+        ripgrep
+        eza
+        pciutils
+        whois
+        zip
+        unzip
+        slack
+        discord
+        spotify
+        typst
+        man-pages-posix
+        man-pages
+        usbutils
+        fprintd
+        imagemagick
+        telegram-desktop
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
       "vagrant"
+      "slack"
+      "discord"
+      "spotify"
     ];
 
     programs.zsh = {
@@ -56,14 +76,19 @@
       }
       ];
       shellAliases = {
-        ll = "ls -l";
-        update = "sudo nix-channel --upgrade";
+        ls = "eza -lah";
+        cat = "bat -Pp";
+        catt = "cat";
+        cata = "bat -APp";
+        update = "sudo nix-channel --update";
         upgrade = "sudo nixos-rebuild switch";
         cg = "sudo nix-collect-garbage";
         cgd = "sudo nix-collect-garbage --delete-older-than 7d";
         userConfig = "vim /etc/nixos/ezri.nix";
         sysConfig = "vim /etc/nixos/configuration.nix";
         tmuxn = "tmux new-session 'tmux source-file .config/tmux/tmux.conf && zsh'";
+        nsz = "nix-shell --run zsh";
+        cm = "cargo mommy";
       };
       history = {
         size = 10000;
@@ -92,6 +117,7 @@
         catppuccin-nvim
           vim-go
           coc-rust-analyzer
+          coc-nvim
       ];
       extraConfig = ''
         syntax on
@@ -105,9 +131,8 @@
         set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
         autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
         autocmd FileType nix setlocal ts=2 sts=2 sw=2 expandtab
-        set colorcolumn=65
-        set textwidth=65
-        set mouse=
+        set colorcolumn=80
+        set textwidth=80
         cmap w!! w !sudo tee % >/dev/null
         set termguicolors
         colorscheme catppuccin-mocha
