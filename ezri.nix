@@ -55,6 +55,8 @@
         imagemagick
         telegram-desktop
         magic-wormhole
+        libnotify
+      	wl-clipboard
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
@@ -119,6 +121,7 @@
           vim-go
           coc-rust-analyzer
           coc-nvim
+          gleam-vim
       ];
       extraConfig = ''
         syntax on
@@ -129,6 +132,7 @@
         set tabstop=4
         set softtabstop=0 noexpandtab
         set shiftwidth=4
+        set mouse=
         set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
         autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
         autocmd FileType nix setlocal ts=2 sts=2 sw=2 expandtab
@@ -160,6 +164,7 @@
         set-option -g renumber-windows on
         set -sg escape-time 0
 
+        set -s set-clipboard on
         set -g mouse on
         setw -g mode-keys vi
         set-option -g mode-keys vi

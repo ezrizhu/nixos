@@ -33,9 +33,20 @@
   hardware.bluetooth.enable = true; # enables support for Bluetooth
   hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
 
+
+  security.pam.u2f = {
+    enable = true;
+    control = "sufficient";
+    settings.cue = true;
+  };
   security.sudo-rs = {
     enable = true;
     wheelNeedsPassword = false;
+  };
+
+  security.pam.services = {
+    login.u2fAuth = true;
+    sudo.u2fAuth = true;
   };
 
   # Set your time zone.
@@ -91,6 +102,15 @@
     docker.enable = true;
     libvirtd.enable = true;
   };
+
+  services.udev.extraRules = ''
+      ACTION=="remove",\
+       ENV{ID_BUS}=="usb",\
+       ENV{ID_MODEL_ID}=="0407",\
+       ENV{ID_VENDOR_ID}=="1050",\
+       ENV{ID_VENDOR}=="Yubico",\
+       RUN+="${pkgs.systemd}/bin/loginctl lock-sessions"
+  '';
 
   programs.virt-manager.enable = true;
 
