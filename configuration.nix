@@ -33,6 +33,10 @@
   hardware.bluetooth.enable = true; # enables support for Bluetooth
   hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
 
+  services.mullvad-vpn = {
+    enable = true;
+    package = pkgs.mullvad-vpn;
+  };
 
   security.pam.u2f = {
     enable = true;
@@ -77,7 +81,7 @@
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.printing.enable = false;
 
   services.flatpak.enable = true;
 
@@ -150,6 +154,15 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = true;
+
+  services.openssh = {
+    enable = true;
+    ports = [ 610 ];
+    settings = {
+      PermitRootLogin = "no";
+  };
+  };
+  networking.firewall.allowedTCPPorts = [ 610 ];
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you

@@ -12,6 +12,10 @@
     ignoreShellProgramCheck = true;
   };
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  programs.kde-pim.kmail = true;
+
   home-manager.users.ezri = { pkgs, ... }: {
     home.packages = with pkgs; [
       croc
@@ -33,6 +37,10 @@
         lm_sensors
         xdg-utils
         kdePackages.kconfig
+        kdePackages.kmail
+        kdePackages.kmail-account-wizard
+        kdePackages.kleopatra
+        kdePackages.kcmutils
         openssl
         bat
         restic
@@ -45,25 +53,41 @@
         zip
         unzip
         slack
-        discord
-        spotify
         typst
         man-pages-posix
         man-pages
         usbutils
-        fprintd
         imagemagick
         telegram-desktop
         magic-wormhole
         libnotify
       	wl-clipboard
+        p7zip
+        spicetify-cli
+        (pkgs.discord-canary.overrideAttrs (old: {
+  postInstall = old.postInstall + ''
+    mv $out/opt/DiscordCanary/resources/app.asar $out/opt/DiscordCanary/resources/_app.asar
+    mkdir -p $out/opt/DiscordCanary/resources/app/app_bootstrap
+    cat > $out/opt/DiscordCanary/resources/app/app_bootstrap/index.js <<- EOF
+    const path = require("path")
+    require(path.resolve(process.env.HOME, "hh3/lib/injector.js"))
+      .inject(path.resolve(__dirname, "../../../_app.asar"))
+    require("../../_app.asar")
+    process.mainModule = require.cache[require.resolve("../../_app.asar")]
+    EOF
+    cat > $out/opt/DiscordCanary/resources/app/package.json <<- EOF
+    { "name": "discord", "main": "./app_bootstrap/index.js", "private": true }
+    EOF
+  '';
+}))
+      discord
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
       "vagrant"
       "slack"
       "discord"
-      "spotify"
+      "discord-canary"
     ];
 
     programs.zsh = {
@@ -206,6 +230,7 @@
         };
       };
     };
+
 
     home.stateVersion = "24.05";
   };
