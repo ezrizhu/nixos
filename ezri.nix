@@ -33,7 +33,6 @@
         feh
         file
         docker-compose
-        vagrant
         lm_sensors
         xdg-utils
         kdePackages.kconfig
@@ -63,7 +62,13 @@
         libnotify
       	wl-clipboard
         p7zip
+        ungoogled-chromium
         spicetify-cli
+        obsidian
+        code-cursor
+        nicotine-plus
+        picard
+        discord
         (pkgs.discord-canary.overrideAttrs (old: {
   postInstall = old.postInstall + ''
     mv $out/opt/DiscordCanary/resources/app.asar $out/opt/DiscordCanary/resources/_app.asar
@@ -80,7 +85,6 @@
     EOF
   '';
 }))
-      discord
     ];
 
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
@@ -88,6 +92,8 @@
       "slack"
       "discord"
       "discord-canary"
+      "obsidian"
+      "cursor"
     ];
 
     programs.zsh = {
@@ -126,6 +132,7 @@
     programs.starship = {
       enable = true;
       settings = {
+        aws.disabled = true;
         add_newline = false;
         character = {
           success_symbol = "[λ](bold green)";

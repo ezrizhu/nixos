@@ -54,6 +54,7 @@
   };
 
   # Set your time zone.
+  #time.timeZone = "America/Los_Angeles";
   time.timeZone = "America/New_York";
 
   fonts.packages = with pkgs; [
@@ -101,6 +102,10 @@
     tmux
   ];
   environment.localBinInPath = true;
+
+  services.udev.packages = [
+    pkgs.android-udev-rules
+  ];
 
   virtualisation = {
     docker.enable = true;
