@@ -4,12 +4,6 @@
 
 { config, lib, pkgs, ... }:
 
-let
-  libident = pkgs.callPackage /ezri/Documents/efinderd/libident.nix {};
-  efingerd = pkgs.callPackage /ezri/Documents/efinderd/efingerd.nix {
-    inherit libident;
-  };
-in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -22,18 +16,7 @@ in
 
   networking.hostName = "lap1"; # Define your hostname.
 
-  services.efingerd = {
-    enable = true;
-    package = efingerd;  # Use your custom efingerd package
-    user = "ezri";
-    useIdentService = true;
-    noLookupAddresses = true;
-    hideFullNames = true;
-    ignoreUserFiles = true;
-  };
-
-  networking.extraHosts = ''
-  '';
+  services.xserver.xkbOptions = "ctrl:swapcaps";
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -43,6 +26,7 @@ in
   boot.supportedFilesystems = [ "btrfs" ];
   hardware.enableAllFirmware = true;
   nixpkgs.config.allowUnfree = true; 
+  nixpkgs.config.segger-jlink.acceptLicense = true;
 
   nix.package = pkgs.lix;
 
@@ -54,11 +38,12 @@ in
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
+  hardware.rtl-sdr.enable = true;
+
   programs.fuse.userAllowOther = true;
 
   # Set your time zone.
   time.timeZone = "America/New_York";
-  #time.timeZone = "America/New_York";
 
   fonts.packages = with pkgs; [
     fira-code
@@ -118,12 +103,16 @@ in
   };
 
   services.udev.extraRules = ''
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="5740", MODE="0666", GROUP="plugdev"
       ACTION=="remove",\
        ENV{ID_BUS}=="usb",\
        ENV{ID_MODEL_ID}=="0407",\
        ENV{ID_VENDOR_ID}=="1050",\
        ENV{ID_VENDOR}=="Yubico",\
        RUN+="${pkgs.systemd}/bin/loginctl lock-sessions"
+
+#SEGGER JLINK
+ATTR{idProduct}=="1061", ATTR{idVendor}=="1366", MODE="666"
   '';
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -141,7 +130,8 @@ in
     fuzzel
     swaylock-effects
     libmbim
-    efingerd
+    eid-mw
+    nrfutil
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -162,6 +152,12 @@ in
       PermitRootLogin = "no";
     };
   };
+
+
+    services.pcscd = {
+      enable = true;
+      plugins = [ pkgs.ccid ];
+    };
 
   networking.firewall.enable = true; 
   networking.firewall.allowedTCPPorts = [ 610 1234 79 ];

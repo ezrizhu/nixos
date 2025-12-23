@@ -6,7 +6,7 @@
   ];
   users.users.ezri = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "networkmanager" "plugdev" "dialout" ]; # Enable ‘sudo’ for the user.
     shell = pkgs.zsh;
     ignoreShellProgramCheck = true;
     home = "/ezri";
@@ -49,6 +49,7 @@
     };
     home.packages = with pkgs; [
         brightnessctl
+        wdisplays
         acpi
         xwayland-satellite
         swaybg
@@ -92,6 +93,8 @@
         networkmanagerapplet
         blueman
         nautilus
+        tarsnap
+        cardpeek
         (pkgs.writeShellScriptBin "nix-search" ''
            export NIX_SEARCH_INDEX_PATH=$HOME/.nix-search
            exec ${lib.getExe pkgs.nix-search} "$@"
@@ -116,6 +119,7 @@
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
       "obsidian"
       "discord"
+      "tarsnap"
     ];
 
     programs.zsh = {
@@ -207,37 +211,36 @@
           battery
       ];
       extraConfig = ''
-        set -g allow-rename off
-        set-option -g status-position top
-        set-option -g repeat-time 0
-        set-option -g renumber-windows on
-        set -sg escape-time 0
+set -g allow-rename off
+set-option -g status-position top
+set-option -g repeat-time 0
+set-option -g renumber-windows on
+set -sg escape-time 0
 
-        set -s set-clipboard on
-        set -g mouse on
-        setw -g mode-keys vi
-        set-option -g mode-keys vi
-        set-option -ga terminal-overrides ",xterm-256color*:Tc:smso"
+set -s set-clipboard on
+set -g mouse on
+setw -g mode-keys vi
+set-option -g mode-keys vi
+set-option -ga terminal-overrides ",xterm-256color*:Tc:smso"
 
-        set -g @catppuccin_window_left_separator ""
-        set -g @catppuccin_window_right_separator " "
-        set -g @catppuccin_window_middle_separator " █"
-        set -g @catppuccin_window_number_position "right"
+set -g @catppuccin_flavor "mocha"
+set -g @catppuccin_window_status_style "rounded"
 
-        set -g @catppuccin_window_default_fill "number"
-        set -g @catppuccin_window_default_text "#W"
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+set -g status-right "#{E:@catppuccin_status_session}"
+set -ag status-right "#{E:@catppuccin_status_date_time}"
+set -ag status-right "#{E:@catppuccin_status_host}"
+set -ag status-right "#{E:@catppuccin_status_user}"
+set -ag status-right "#{E:@catppuccin_status_application}"
+set -ag status-right "#{E:@catppuccin_status_directory}"
+set -g @catppuccin_window_text " #W "
+set -g @catppuccin_window_current_text " #W "
 
-        set -g @catppuccin_window_current_fill "number"
-        set -g @catppuccin_window_current_text "#W"
-
-        set -g @catppuccin_status_modules_right "session user host battery date_time"
-        set -g @catppuccin_status_left_separator  " "
-        set -g @catppuccin_status_right_separator ""
-        set -g @catppuccin_status_fill "icon"
-        set -g @catppuccin_status_connect_separator "no"
-
-        set -g @catppuccin_directory_text "#{pane_current_path}"
-        set -g @catppuccin_date_time_text "%Y-%m-%d %H:%M"
+set-option -g bell-action any
+set-option -g visual-bell off
+set-hook -g alert-bell "run-shell '~/.config/tmux/bell.sh \"#S\" \"#W\"'"
         '';
     };
 
@@ -270,6 +273,9 @@
       extraConfig = {
         gpg = {
           "format" = "ssh";
+        };
+        safe = {
+          "directory" = "*";
         };
       };
     };
